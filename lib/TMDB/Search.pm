@@ -154,7 +154,7 @@ sub tv {
         %options
     };
     $params->{language} = $self->session->lang if $self->session->lang;
-    $params->{year} = $year if $year;
+    $params->{first_air_date_year} = $year if $year;
 
     warn "DEBUG: Searching for $string\n" if $self->session->debug;
   return $self->_search(
