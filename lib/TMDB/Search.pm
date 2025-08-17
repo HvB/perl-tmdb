@@ -67,11 +67,30 @@ sub new {
 ## Search Movies
 ## ====================
 sub movie {
-    my ( $self, $string ) = @_;
+    my ( $self, $string, @args ) = @_;
+    my %options = validate_with(
+        params => [@args],
+        spec   => {
+            year => {
+                type     => SCALAR,
+                optional => 1,
+                regex    => qr/^\d{4}$/
+            },
+            primary_release_year => {
+                type     => SCALAR,
+                optional => 1,
+                regex    => qr/^\d{4}$/
+            },
+            region => {
+                type     => SCALAR,
+                optional => 1,
+            },
+        },
+    );
 
     # Get Year
     my $year;
-    if ( $string =~ m{.+\((\d{4})\)$} ) {
+    if ( !$options{year} && $string =~ m{.+\((\d{4})\)$} ) {
         $year = $1;
         $string =~ s{\($year\)$}{};
     } ## end if ( $string =~ m{.+\((\d{4})\)$})
@@ -83,6 +102,7 @@ sub movie {
     my $params = {
         query         => $string,
         include_adult => $self->include_adult,
+        %options
     };
     $params->{language} = $self->session->lang if $self->session->lang;
     $params->{year} = $year if $year;
@@ -100,11 +120,26 @@ sub movie {
 ## Search TV Shows
 ## ====================
 sub tv {
-    my ( $self, $string ) = @_;
+    my ( $self, $string, @args ) = @_;
+    my %options = validate_with(
+        params => [@args],
+        spec   => {
+            year => {
+                type     => SCALAR,
+                optional => 1,
+                regex    => qr/^\d{4}$/
+            },
+            first_air_date_year => {
+                type     => SCALAR,
+                optional => 1,
+                regex    => qr/^\d{4}$/
+            },
+        },
+    );
 
     # Get Year
     my $year;
-    if ( $string =~ m{.+\((\d{4})\)$} ) {
+    if ( !$options{year} && $string =~ m{.+\((\d{4})\)$} ) {
         $year = $1;
         $string =~ s{\($year\)$}{};
     } ## end if ( $string =~ m{.+\((\d{4})\)$})
@@ -116,6 +151,7 @@ sub tv {
     my $params = {
         query         => $string,
         include_adult => $self->include_adult,
+        %options
     };
     $params->{language} = $self->session->lang if $self->session->lang;
     $params->{year} = $year if $year;
